@@ -7,25 +7,10 @@ import struct
 import threading
 from queue import Queue
 import requests
-from sensor_library import request_handle_udp, start_scanoutput, set_scanoutput_config, get_parameters, stop_scanoutput
-
-
-# [START global variables]
-# LEFT_SENSOR_ADDRESS = '192.168.1.12'
-# [END global variables]
-
-# [START turn on sensor and start scanning]
-R_REQUEST_HANDLE_UDP = request_handle_udp('192.168.1.12', 54321, skip_scans=46)
-S_HANDLE = str(R_REQUEST_HANDLE_UDP['handle'])
-print('Handle is: ' + S_HANDLE)
-
-R_START_SCANOUPUT = start_scanoutput('192.168.1.12', S_HANDLE)
-print(R_START_SCANOUPUT)
-# [END turn on sensor and start scanning]
 
 
 # [START network configs]
-CLIENT_ADDRESS = '192.168.1.50'
+CLIENT_ADDRESS = '127.0.0.1'
 PORT = 54321
 # [END network configs]
 
