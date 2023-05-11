@@ -31,7 +31,7 @@ with open('data.bin', 'rb') as f:
 
                 # Send the packet via UDP
                 sock.sendto(packet_with_magic, (CLIENT_UDP_IP, CLIENT_UDP_PORT))
-                print('Sent a new packe!')
+                print('Sent a new packet!')
 
                 # Remove the sent packet from the chunk
                 chunk = chunk[magic_idx+2:]
