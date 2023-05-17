@@ -61,7 +61,7 @@ class UDPServerThread(QThread):
                 # This must be changed if the sensor scanning configurations change.
                 TOTAL_PACKETS_PER_SCAN = 6 
                 if packet_number == TOTAL_PACKETS_PER_SCAN:
-                    print(f'Received a full scan: {scan_number}')
+                    print(f'Received a full scan with number: {scan_number}')
 
                     # packets_for_this_scan is a list containing all binary from all the packets for a given scan. If we 
                     # loop through it we can extract all distances for the current scan.
@@ -87,4 +87,4 @@ class UDPServerThread(QThread):
 
     def stop(self):
         self.requestInterruption()
-        print('Stopped the UDP Server Thread')
+        print('Stopped the UDP Server Thread...')
