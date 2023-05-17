@@ -119,7 +119,6 @@ class MainWindow(QMainWindow):
 
 
     def update_plot(self, distances):
-        print('Run update_plot')
         distances = np.array(distances)
 
         if len(distances) != 1800:
