@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.canvas)
 
         # Create the UDP server thread and start it
-        self.udp_thread = UDPServerThread(verbose=False)
+        self.udp_thread = UDPServerThread(ip_address='127.0.0.1', udp_port=54321, verbose=False)
 
         # Create a polar plot
         self.ax = self.figure.add_subplot(1, 1, 1, projection='polar')

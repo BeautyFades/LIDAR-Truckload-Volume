@@ -2,28 +2,31 @@ import socket
 from PyQt5.QtCore import QThread, pyqtSignal
 import struct
 
-
-UDP_IP = "127.0.0.1"  # IP address to bind the server
-UDP_PORT = 54321      # Port to listen for incoming packets
-PCK_SIZE = 4096
-
 class UDPServerThread(QThread):
     packet_received = pyqtSignal(list)  # Signal to emit the received packet when thread finishes
     stop_signal = pyqtSignal()          # Signal to emit the received packet when thread is ordered to stop
 
-    def __init__(self, verbose: bool = False):
+    def __init__(self, 
+                 ip_address: str,
+                 udp_port: int,
+                 packet_size: int = 4096,
+                 verbose: bool = False
+                 ):
 
         super().__init__()
         self.is_running = True
         self.packets_by_scan = dict()
         self.verbose = verbose
+        self.ip_address = ip_address
+        self.udp_port = udp_port
+        self.packet_size = packet_size
 
 
     def run(self):
         print('Started UDP Server Thread...')
 
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.server_socket.bind((UDP_IP, UDP_PORT))
+        self.server_socket.bind((self.ip_address, self.udp_port))
         self.running = True
 
         while self.is_running:
@@ -31,7 +34,7 @@ class UDPServerThread(QThread):
             if self.isInterruptionRequested():
                 break
 
-            data, _ = self.server_socket.recvfrom(PCK_SIZE)
+            data, _ = self.server_socket.recvfrom(self.packet_size)
 
             if len(data) > 2:
                 magic = struct.unpack('<H', data[:2])[0]
