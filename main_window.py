@@ -85,24 +85,48 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.canvas)
 
         # Create the UDP server thread and start it
-        self.udp_thread = UDPServerThread(ip_address='127.0.0.1', udp_port=54321, verbose=False)
+        self.udp_thread1 = UDPServerThread(ip_address='127.0.0.1', udp_port=54321, verbose=False)
+        self.udp_thread2 = UDPServerThread(ip_address='127.0.0.1', udp_port=54322, verbose=False)
+        self.udp_thread3 = UDPServerThread(ip_address='127.0.0.1', udp_port=54323, verbose=False)
 
         # Create a polar plot
-        self.ax = self.figure.add_subplot(1, 1, 1, projection='polar')
-        self.ax.set_theta_zero_location('N')
-        self.ax.set_theta_direction(-1)
-        self.ax.set_rlim(0, 800)
-        self.ax.set_rmax(800)
         self.angle = [radians(a / 10) for a in range(0, 3600, 2)]
-        self.line, = self.ax.plot([], [], 'b')
+        
+        self.ax1 = self.figure.add_subplot(1, 3, 1, projection='polar')
+        self.ax1.set_theta_zero_location('N')
+        self.ax1.set_theta_direction(-1)
+        self.ax1.set_rlim(0, 3000)
+        self.ax1.set_rmax(3000)
+        self.line1, = self.ax1.plot([], [], 'b')
+
+        self.ax2 = self.figure.add_subplot(1, 3, 2, projection='polar')
+        self.ax2.set_theta_zero_location('N')
+        self.ax2.set_theta_direction(-1)
+        self.ax2.set_rlim(0, 3000)
+        self.ax2.set_rmax(3000)
+        self.line2, = self.ax2.plot([], [], 'b')
+
+        self.ax3 = self.figure.add_subplot(1, 3, 3, projection='polar')
+        self.ax3.set_theta_zero_location('N')
+        self.ax3.set_theta_direction(-1)
+        self.ax3.set_rlim(0, 3000)
+        self.ax3.set_rmax(3000)
+        self.line3, = self.ax3.plot([], [], 'b')
 
 
     def start_button_task(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.startButton.setText('Scanning...')
-        self.udp_thread.start()
-        self.udp_thread.packet_received.connect(self.update_plot)
+        self.udp_thread1.start()
+        self.udp_thread1.packet_received.connect(self.update_plot1)
+
+        self.udp_thread2.start()
+        self.udp_thread2.packet_received.connect(self.update_plot2)
+
+        self.udp_thread3.start()
+        self.udp_thread3.packet_received.connect(self.update_plot3)
+
         
 
     def stop_button_task(self):
@@ -110,23 +134,44 @@ class MainWindow(QMainWindow):
         self.stopButton.setEnabled(False)
         self.startButton.setText('Start Scanning')
 
-        if self.udp_thread.isRunning():
-            self.udp_thread.packet_received.disconnect(self.update_plot)
-            self.udp_thread.stop()
-            self.udp_thread.wait()
+        if self.udp_thread1.isRunning():
+            self.udp_thread1.packet_received.disconnect(self.update_plot)
+            self.udp_thread1.stop()
+            self.udp_thread1.wait()
             self.line.set_data([0], [0])
             self.canvas.draw()
 
 
-    def update_plot(self, distances):
+    def update_plot1(self, distances):
         distances = np.array(distances)
 
         if len(distances) != 1800:
             print('Received partial scan data only. Discard current plot.')
         
         else:
-            self.line.set_data(self.angle, distances)
+            self.line1.set_data(self.angle, distances)
             self.canvas.draw()
+
+    def update_plot2(self, distances):
+        distances = np.array(distances)
+
+        if len(distances) != 1800:
+            print('Received partial scan data only. Discard current plot.')
+        
+        else:
+            self.line2.set_data(self.angle, distances)
+            self.canvas.draw()
+
+    def update_plot3(self, distances):
+        distances = np.array(distances)
+
+        if len(distances) != 1800:
+            print('Received partial scan data only. Discard current plot.')
+        
+        else:
+            self.line3.set_data(self.angle, distances)
+            self.canvas.draw()
+
 
 
 # Create the PyQt5 application
