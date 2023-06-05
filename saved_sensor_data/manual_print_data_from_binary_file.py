@@ -29,17 +29,22 @@ with open('saved_sensor_data/left_sensor.bin', 'rb') as f:
 
                 # Send the packet via UDP
                 if len(packet_with_magic) > 2:
-            # Log magic byte to guarantee it is working
+                    # Log magic byte to guarantee it is working
                     magic = struct.unpack('<H', packet_with_magic[:2])[0]
                     print('magic byte: ' + str(hex(magic)))
+
                     packet_type = struct.unpack('<H', packet_with_magic[2:4])[0]
                     print('packet_type: ' + str(hex(packet_type)))
+                    
                     packet_size = struct.unpack('<i', packet_with_magic[4:8])[0]
                     print('packet_size: ' + str(int(packet_size)))
+
                     header_size = struct.unpack('<H', packet_with_magic[8:10])[0]
                     print('header_size: ' + str(int(header_size)))
+
                     scan_number = struct.unpack('<H', packet_with_magic[10:12])[0]
                     print('scan_number: ' + str(int(scan_number)))
+
                     packet_number = struct.unpack('<H', packet_with_magic[12:14])[0]
                     print('packet_number in scan: ' + str(int(packet_number)))
 
@@ -54,7 +59,7 @@ with open('saved_sensor_data/left_sensor.bin', 'rb') as f:
 
                     scan_frequency = struct.unpack('<i', packet_with_magic[34:38])[0]
                     print('scan_frequency in scan: ' + str(int(scan_frequency)))
-                    
+
                 # Remove the sent packet from the chunk
                 chunk = chunk[magic_idx+2:]
 
