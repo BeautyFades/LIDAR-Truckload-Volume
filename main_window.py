@@ -4,6 +4,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
 from udp_server_thread import UDPServerThread
 from math import radians
@@ -21,7 +22,7 @@ class MainWindow(QMainWindow):
         self.setMaximumSize(QSize(800, 600))
 
         self.central_widget = QWidget(self)
-        self.central_widget.setObjectName('centralwidget')
+        self.central_widget.setObjectName('centralWidget')
         layout = QVBoxLayout()
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
@@ -30,6 +31,7 @@ class MainWindow(QMainWindow):
         self.stopButton.setObjectName('stopButton')
         self.stopButton.setText('Stop Scanning')
         self.stopButton.setGeometry(QRect(630, 550, 161, 41))
+        self.stopButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.stopButton.setCheckable(False)
         self.stopButton.setEnabled(False)
         self.stopButton.clicked.connect(self.stop_button_task)
@@ -50,10 +52,37 @@ class MainWindow(QMainWindow):
         self.startButton.setGeometry(QRect(460, 550, 161, 41))
         self.startButton.setCheckable(False)
         self.startButton.setEnabled(True)
+        self.startButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.startButton.clicked.connect(self.start_button_task)
         self.startButton.setStyleSheet("border: none;\n"
                                       "font-family: 'Lato';\n"
                                       "background-color: #2ecc71;\n"
+                                      "cursor: pointer;\n"
+                                      "padding: 15px 20px;\n"
+                                      "display: inline-block;\n"
+                                      "text-transform: uppercase;\n"
+                                      "letter-spacing: 1px;\n"
+                                      "font-weight: 700;"
+                                      )
+        
+        self.checkbox = QCheckBox(self.central_widget)
+        self.checkbox.setObjectName('recordToDiskCheckbox')
+        self.checkbox.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.checkbox.setText('Salvar em disco?')
+        self.checkbox.setChecked(True)
+        self.checkbox.stateChanged.connect(self.checkboxStateChanged)
+        self.checkbox.move(350, 550)  # Adjust the coordinates as neede
+        
+        self.processButton = QPushButton(self.central_widget)
+        self.processButton.setObjectName('processButton')
+        self.processButton.setText('Process Data')
+        self.processButton.setGeometry(QRect(630, 55, 161, 41))
+        self.processButton.setEnabled(True)
+        self.processButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.processButton.clicked.connect(self.stop_button_task)
+        self.processButton.setStyleSheet("border: none;\n"
+                                      "font-family: 'Lato';\n"
+                                      "background-color: #FF8C00;\n"
                                       "cursor: pointer;\n"
                                       "padding: 15px 20px;\n"
                                       "display: inline-block;\n"
@@ -113,6 +142,11 @@ class MainWindow(QMainWindow):
         self.ax3.set_rmax(3000)
         self.line3, = self.ax3.plot([], [], 'b')
 
+    def checkboxStateChanged(self, state):
+        if state == 0:
+            print("Checkbox is unchecked")
+        else:
+            print("Checkbox is checked")
 
     def start_button_task(self):
         self.startButton.setEnabled(False)

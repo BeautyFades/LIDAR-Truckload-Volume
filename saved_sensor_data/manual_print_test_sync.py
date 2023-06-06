@@ -9,7 +9,7 @@ print('Sensor starting...')
 
 
 # Open the binary file in read-binary mode
-with open('saved_sensor_data/right_sensor.bin', 'rb') as f:
+with open('saved_sensor_data/top_sensor.bin', 'rb') as f:
 
     # Read each row from the binary file and print it
     while True:
@@ -32,13 +32,7 @@ with open('saved_sensor_data/right_sensor.bin', 'rb') as f:
                     # Log magic byte to guarantee it is working
                     timestamp_raw = struct.unpack('<Q', packet_with_magic[14:22])[0]
                     scan_number = struct.unpack('<H', packet_with_magic[10:12])[0]
-                    #print(f'{str(int(scan_number))} | {str(int(timestamp_raw))}')
-                    if int(scan_number == 289+6):
-                        start_byte = 76
-                        while start_byte < len(packet_with_magic):
-                            dist = struct.unpack('<i', packet_with_magic[start_byte:start_byte+4])[0]
-                            print(dist)
-                            start_byte += 4
+                    print(f'{str(int(scan_number))} | {str(int(timestamp_raw))}')
 
                 # Remove the sent packet from the chunk
                 chunk = chunk[magic_idx+2:]
