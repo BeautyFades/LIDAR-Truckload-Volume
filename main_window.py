@@ -14,6 +14,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.offsetInputValues = {}
+
         self.setWindowTitle("UFSC - Coontrol - LiDAR Volume Measurement")
         self.setWindowIcon(QIcon("interface/coontrol-icon.png"))
         self.resize(800, 600)
@@ -26,6 +28,21 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
+
+        self.topSensorLabel = QLabel('Top Sensor Offsets:', self)
+        self.topSensorLabel.setObjectName('topSensorLabel')
+        self.topSensorLabel.move(630, 120)
+        
+
+        self.topSensorAngleValidator = QDoubleValidator()
+        self.topSensorAngleValidator.setDecimals(4)
+        self.topSensorAngleValidator.setRange(-90, 90)
+        self.topSensorAngleBox = QLineEdit(self)
+        self.topSensorAngleBox.setObjectName('topSensorAngleBox')
+        self.topSensorAngleBox.setValidator(self.topSensorAngleValidator)
+        self.topSensorAngleBox.textChanged.connect(self.update_formatting)
+        self.topSensorAngleBox.textChanged.connect(lambda: self.get_value(self.topSensorAngleBox))
+
 
         self.stopButton = QPushButton(self.central_widget)
         self.stopButton.setObjectName('stopButton')
@@ -64,14 +81,6 @@ class MainWindow(QMainWindow):
                                       "letter-spacing: 1px;\n"
                                       "font-weight: 700;"
                                       )
-        
-        self.checkbox = QCheckBox(self.central_widget)
-        self.checkbox.setObjectName('recordToDiskCheckbox')
-        self.checkbox.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.checkbox.setText('Salvar em disco?')
-        self.checkbox.setChecked(True)
-        self.checkbox.stateChanged.connect(self.checkboxStateChanged)
-        self.checkbox.move(350, 550)  # Adjust the coordinates as neede
         
         self.processButton = QPushButton(self.central_widget)
         self.processButton.setObjectName('processButton')
@@ -205,6 +214,35 @@ class MainWindow(QMainWindow):
         else:
             self.line3.set_data(self.angle, distances)
             self.canvas.draw()
+
+    def update_formatting(self):
+        # Get the QLineEdit widget that emitted the signal
+        line_edit = self.sender()
+
+        # Get the inputted text
+        text = line_edit.text()
+
+        # Convert the input to a float with 3 decimals
+        try:
+            value = float(text)
+            line_edit.setText("{:.3f}".format(value))
+        except ValueError:
+            # Handle non-numeric input if desired
+            line_edit.setText(str(0))
+
+    
+    def get_value(self, line_edit):
+        # Get the inputted text from the specified QLineEdit
+        input_text = line_edit.text()
+
+        # Convert the input to a float, if desired
+        try:
+            value = float(input_text)
+            # Save the input value to the dictionary using the line_edit as the key
+            self.offsetInputValues[line_edit.objectName()] = value
+            print(self.offsetInputValues)
+        except ValueError:
+            print("Invalid input")
 
 
 
