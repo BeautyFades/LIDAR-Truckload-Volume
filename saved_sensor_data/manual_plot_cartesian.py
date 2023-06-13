@@ -5400,19 +5400,67 @@ LEFT_DATA = [943,
 1000]
 
 from math import radians
+from numpy import exp, abs, angle, imag, real
 import matplotlib.pyplot as plt
 
 
-angle = [radians(a / 10) for a in range(0, 3600, 2)]
+angles = [radians(a / 10) for a in range(0, 3600, 2)]
+
+def polar2cart(r,theta):
+    return r * exp(1j * theta)
 
 
+TOP_DATA_CARTESIAN = []
+LEFT_DATA_CARTESIAN = []
+RIGHT_DATA_CARTESIAN = []
+for index, elem in enumerate(TOP_DATA):
+    complex_num = polar2cart(elem, angles[index])
+    complex_tuple = (complex_num.real, complex_num.imag)
+    TOP_DATA_CARTESIAN.append(complex_tuple)
 
-fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
-ax.set_theta_zero_location('N')
-ax.set_theta_direction(-1)
-ax.set_rlim(0, 3000)
-ax.set_rmax(3000)
-ax.plot(angle, TOP_DATA, color="blue")
-ax.plot(angle, LEFT_DATA, color="red")
-ax.plot(angle, RIGHT_DATA, color="black")
+for index, elem in enumerate(LEFT_DATA):
+    complex_num = polar2cart(elem, angles[index])
+    complex_tuple = (complex_num.real, complex_num.imag)
+    LEFT_DATA_CARTESIAN.append(complex_tuple)
+
+for index, elem in enumerate(RIGHT_DATA):
+    complex_num = polar2cart(elem, angles[index])
+    complex_tuple = (complex_num.real, complex_num.imag)
+    RIGHT_DATA_CARTESIAN.append(complex_tuple)
+
+# print(TOP_DATA_CARTESIAN)
+
+
+# Extract x and y values from each tuple
+# Invert X and Y to make the figure right side up.
+x_values_t = [t[1] for t in TOP_DATA_CARTESIAN]
+y_values_t = [t[0] for t in TOP_DATA_CARTESIAN]
+x_values_l = [t[1]*-1 - 1226 for t in LEFT_DATA_CARTESIAN]
+y_values_l = [t[0]-1070 for t in LEFT_DATA_CARTESIAN]
+x_values_r = [t[1]+1180 for t in RIGHT_DATA_CARTESIAN]
+y_values_r = [t[0]-1070 for t in RIGHT_DATA_CARTESIAN]
+
+# Create a plot
+plt.plot(x_values_t, y_values_t, marker=None, color='black')
+plt.plot(x_values_l, y_values_l, marker=None, color='blue')
+plt.plot(x_values_r, y_values_r, marker=None, color='red')
+
+# Add labels and title
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Plotting List of Tuples')
+
+# Display the plot
 plt.show()
+
+
+
+# fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
+# ax.set_theta_zero_location('N')
+# ax.set_theta_direction(-1)
+# ax.set_rlim(0, 3000)
+# ax.set_rmax(3000)
+# ax.plot(angle, TOP_DATA, color="blue")
+# ax.plot(angle, LEFT_DATA, color="red")
+# ax.plot(angle, RIGHT_DATA, color="black")
+# plt.show()
