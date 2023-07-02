@@ -4,6 +4,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
 from udp_server_thread import UDPServerThread
 from math import radians
@@ -13,6 +14,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.offsetInputValues = {}
+
         self.setWindowTitle("UFSC - Coontrol - LiDAR Volume Measurement")
         self.setWindowIcon(QIcon("interface/coontrol-icon.png"))
         self.resize(800, 600)
@@ -21,15 +24,31 @@ class MainWindow(QMainWindow):
         self.setMaximumSize(QSize(800, 600))
 
         self.central_widget = QWidget(self)
-        self.central_widget.setObjectName('centralwidget')
+        self.central_widget.setObjectName('centralWidget')
         layout = QVBoxLayout()
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
+
+        self.topSensorLabel = QLabel('Top Sensor Offsets:', self)
+        self.topSensorLabel.setObjectName('topSensorLabel')
+        self.topSensorLabel.move(630, 120)
+        
+
+        self.topSensorAngleValidator = QDoubleValidator()
+        self.topSensorAngleValidator.setDecimals(4)
+        self.topSensorAngleValidator.setRange(-90, 90)
+        self.topSensorAngleBox = QLineEdit(self)
+        self.topSensorAngleBox.setObjectName('topSensorAngleBox')
+        self.topSensorAngleBox.setValidator(self.topSensorAngleValidator)
+        self.topSensorAngleBox.textChanged.connect(self.update_formatting)
+        self.topSensorAngleBox.textChanged.connect(lambda: self.get_value(self.topSensorAngleBox))
+
 
         self.stopButton = QPushButton(self.central_widget)
         self.stopButton.setObjectName('stopButton')
         self.stopButton.setText('Stop Scanning')
         self.stopButton.setGeometry(QRect(630, 550, 161, 41))
+        self.stopButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.stopButton.setCheckable(False)
         self.stopButton.setEnabled(False)
         self.stopButton.clicked.connect(self.stop_button_task)
@@ -50,10 +69,29 @@ class MainWindow(QMainWindow):
         self.startButton.setGeometry(QRect(460, 550, 161, 41))
         self.startButton.setCheckable(False)
         self.startButton.setEnabled(True)
+        self.startButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.startButton.clicked.connect(self.start_button_task)
         self.startButton.setStyleSheet("border: none;\n"
                                       "font-family: 'Lato';\n"
                                       "background-color: #2ecc71;\n"
+                                      "cursor: pointer;\n"
+                                      "padding: 15px 20px;\n"
+                                      "display: inline-block;\n"
+                                      "text-transform: uppercase;\n"
+                                      "letter-spacing: 1px;\n"
+                                      "font-weight: 700;"
+                                      )
+        
+        self.processButton = QPushButton(self.central_widget)
+        self.processButton.setObjectName('processButton')
+        self.processButton.setText('Process Data')
+        self.processButton.setGeometry(QRect(630, 55, 161, 41))
+        self.processButton.setEnabled(True)
+        self.processButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.processButton.clicked.connect(self.stop_button_task)
+        self.processButton.setStyleSheet("border: none;\n"
+                                      "font-family: 'Lato';\n"
+                                      "background-color: #FF8C00;\n"
                                       "cursor: pointer;\n"
                                       "padding: 15px 20px;\n"
                                       "display: inline-block;\n"
@@ -113,6 +151,11 @@ class MainWindow(QMainWindow):
         self.ax3.set_rmax(3000)
         self.line3, = self.ax3.plot([], [], 'b')
 
+    def checkboxStateChanged(self, state):
+        if state == 0:
+            print("Checkbox is unchecked")
+        else:
+            print("Checkbox is checked")
 
     def start_button_task(self):
         self.startButton.setEnabled(False)
@@ -171,6 +214,35 @@ class MainWindow(QMainWindow):
         else:
             self.line3.set_data(self.angle, distances)
             self.canvas.draw()
+
+    def update_formatting(self):
+        # Get the QLineEdit widget that emitted the signal
+        line_edit = self.sender()
+
+        # Get the inputted text
+        text = line_edit.text()
+
+        # Convert the input to a float with 3 decimals
+        try:
+            value = float(text)
+            line_edit.setText("{:.3f}".format(value))
+        except ValueError:
+            # Handle non-numeric input if desired
+            line_edit.setText(str(0))
+
+    
+    def get_value(self, line_edit):
+        # Get the inputted text from the specified QLineEdit
+        input_text = line_edit.text()
+
+        # Convert the input to a float, if desired
+        try:
+            value = float(input_text)
+            # Save the input value to the dictionary using the line_edit as the key
+            self.offsetInputValues[line_edit.objectName()] = value
+            print(self.offsetInputValues)
+        except ValueError:
+            print("Invalid input")
 
 
 
