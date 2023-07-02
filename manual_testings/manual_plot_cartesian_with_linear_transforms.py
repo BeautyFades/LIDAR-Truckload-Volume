@@ -1,3 +1,8 @@
+from math import radians
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.ndimage import rotate
+
 TOP_DATA = [86,
 88,
 72,
@@ -5398,47 +5403,86 @@ LEFT_DATA = [943,
 1150,
 1062,
 1000]
-
-from math import radians
-from numpy import exp, abs, angle, imag, real
-import matplotlib.pyplot as plt
+POLAR_ANGLES = [radians(a / 10) for a in range(0, 3600, 2)]
 
 
-angles = [radians(a / 10) for a in range(0, 3600, 2)]
+def polar2cart(r, theta):
+    return r * np.exp(1j * theta)
 
-def polar2cart(r,theta):
-    return r * exp(1j * theta)
+
+def rotate_points(points, pivot, angle):
+    points_array = np.array(points)
+    x = points_array[:, 0]
+    y = points_array[:, 1]
+
+    # Calculate the translation vector to move the pivot point to the origin
+    translation = -np.array(pivot)
+    translated_x = x + translation[0]
+    translated_y = y + translation[1]
+
+    # Apply the rotation transformation
+    theta = np.radians(angle)
+    rotated_x = np.cos(theta) * translated_x - np.sin(theta) * translated_y
+    rotated_y = np.sin(theta) * translated_x + np.cos(theta) * translated_y
+
+    # Translate the points back to the original position
+    translated_back_x = rotated_x - translation[0]
+    translated_back_y = rotated_y - translation[1]
+
+    # Combine translated back x and y coordinates into points array
+    translated_back_points = np.column_stack((translated_back_x, translated_back_y))
+
+    # Convert the NumPy array back to a list of tuples
+    rotated_points_list = translated_back_points.tolist()
+
+    return rotated_points_list
 
 
 TOP_DATA_CARTESIAN = []
 LEFT_DATA_CARTESIAN = []
 RIGHT_DATA_CARTESIAN = []
+
 for index, elem in enumerate(TOP_DATA):
-    complex_num = polar2cart(elem, angles[index])
-    complex_tuple = (complex_num.real, complex_num.imag)
-    TOP_DATA_CARTESIAN.append(complex_tuple)
+    complex_num = polar2cart(elem, POLAR_ANGLES[index])
+    cart_tuple = (complex_num.real, complex_num.imag)
+    TOP_DATA_CARTESIAN.append(cart_tuple)
 
 for index, elem in enumerate(LEFT_DATA):
-    complex_num = polar2cart(elem, angles[index])
-    complex_tuple = (complex_num.real, complex_num.imag)
-    LEFT_DATA_CARTESIAN.append(complex_tuple)
+    complex_num = polar2cart(elem, POLAR_ANGLES[index])
+    cart_tuple = (complex_num.real, complex_num.imag)
+    LEFT_DATA_CARTESIAN.append(cart_tuple)
 
 for index, elem in enumerate(RIGHT_DATA):
-    complex_num = polar2cart(elem, angles[index])
-    complex_tuple = (complex_num.real, complex_num.imag)
-    RIGHT_DATA_CARTESIAN.append(complex_tuple)
+    complex_num = polar2cart(elem, POLAR_ANGLES[index])
+    cart_tuple = (complex_num.real, complex_num.imag)
+    RIGHT_DATA_CARTESIAN.append(cart_tuple)
 
-# print(TOP_DATA_CARTESIAN)
+
+
+right_sensor_pivot = (0, 0)  # Pivot point
+right_sensor_rot_angle = -1.3  # Rotation angle in degrees
+RIGHT_DATA_CARTESIAN = rotate_points(RIGHT_DATA_CARTESIAN, right_sensor_pivot, right_sensor_rot_angle)
+
+left_sensor_pivot = (0, 0)  # Pivot point
+left_sensor_rot_angle = 2  # Rotation angle in degrees
+LEFT_DATA_CARTESIAN = rotate_points(LEFT_DATA_CARTESIAN, left_sensor_pivot, left_sensor_rot_angle)
+
+top_sensor_pivot = (0, 0)  # Pivot point
+top_sensor_rot_angle = 2  # Rotation angle in degrees
+TOP_DATA_CARTESIAN = rotate_points(TOP_DATA_CARTESIAN, top_sensor_pivot, top_sensor_rot_angle)
 
 
 # Extract x and y values from each tuple
 # Invert X and Y to make the figure right side up.
-x_values_t = [t[1] for t in TOP_DATA_CARTESIAN]
-y_values_t = [t[0] for t in TOP_DATA_CARTESIAN]
+x_values_t = [t[1]           for t in TOP_DATA_CARTESIAN]
+y_values_t = [t[0]           for t in TOP_DATA_CARTESIAN]
 x_values_l = [t[1]*-1 - 1226 for t in LEFT_DATA_CARTESIAN]
-y_values_l = [t[0]-1070 for t in LEFT_DATA_CARTESIAN]
-x_values_r = [t[1]+1180 for t in RIGHT_DATA_CARTESIAN]
-y_values_r = [t[0]-1070 for t in RIGHT_DATA_CARTESIAN]
+y_values_l = [t[0]    - 1070 for t in LEFT_DATA_CARTESIAN]
+x_values_r = [t[1]    + 1180 for t in RIGHT_DATA_CARTESIAN]
+y_values_r = [t[0]    - 1070 for t in RIGHT_DATA_CARTESIAN]
+
+
+
 
 # Create a plot
 plt.plot(x_values_t, y_values_t, marker=None, color='black')
@@ -5448,19 +5492,8 @@ plt.plot(x_values_r, y_values_r, marker=None, color='red')
 # Add labels and title
 plt.xlabel('X')
 plt.ylabel('Y')
-plt.title('Plotting List of Tuples')
+plt.grid(True)
+plt.title('Sensor Snapshot')
 
 # Display the plot
 plt.show()
-
-
-
-# fig, ax = plt.subplots(subplot_kw=dict(projection='polar'))
-# ax.set_theta_zero_location('N')
-# ax.set_theta_direction(-1)
-# ax.set_rlim(0, 3000)
-# ax.set_rmax(3000)
-# ax.plot(angle, TOP_DATA, color="blue")
-# ax.plot(angle, LEFT_DATA, color="red")
-# ax.plot(angle, RIGHT_DATA, color="black")
-# plt.show()

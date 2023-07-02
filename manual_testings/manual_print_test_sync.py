@@ -1,3 +1,9 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# This synchronization technique did not work!
+# We tried using the sensor timestamp_raw to sync up sensor readings from multiple sensors but it did not line up
+# correctly. The solution was to manually sync the sensors visually using a slider in the interface.
+# ----------------------------------------------------------------------------------------------------------------------
+
 import struct
 import time
 
