@@ -5492,6 +5492,7 @@ plt.plot(x_values_r, y_values_r, marker=None, color='red')
 # Add labels and title
 plt.xlabel('X')
 plt.ylabel('Y')
+plt.grid(True)
 plt.title('Sensor Snapshot')
 
 # Display the plot
