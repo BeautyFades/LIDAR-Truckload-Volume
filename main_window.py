@@ -142,72 +142,6 @@ class MainWindow(QMainWindow):
         self.stopButton.setEnabled(False)
         self.startButton.setText('Start Scanning')
 
-        # if self.udp_thread1.isRunning():
-        #     self.udp_thread1.packet_received.disconnect(self.update_plot1)
-        #     self.udp_thread1.stop()
-        #     self.udp_thread1.wait()
-        #     self.line.set_data([0], [0])
-        #     self.canvas.draw()
-
-
-    def update_plot1(self, distances):
-        distances = np.array(distances)
-
-        if len(distances) != 1800:
-            print('Received partial scan data only. Discard current plot.')
-        
-        else:
-            self.line1.set_data(self.angle, distances)
-            self.canvas.draw()
-
-    def update_plot2(self, distances):
-        distances = np.array(distances)
-
-        if len(distances) != 1800:
-            print('Received partial scan data only. Discard current plot.')
-        
-        else:
-            self.line2.set_data(self.angle, distances)
-            self.canvas.draw()
-
-    def update_plot3(self, distances):
-        distances = np.array(distances)
-
-        if len(distances) != 1800:
-            print('Received partial scan data only. Discard current plot.')
-        
-        else:
-            self.line3.set_data(self.angle, distances)
-            self.canvas.draw()
-
-    def update_formatting(self):
-        # Get the QLineEdit widget that emitted the signal
-        line_edit = self.sender()
-
-        # Get the inputted text
-        text = line_edit.text()
-
-        # Convert the input to a float with 3 decimals
-        try:
-            value = float(text)
-            line_edit.setText("{:.3f}".format(value))
-        except ValueError:
-            # Handle non-numeric input if desired
-            line_edit.setText(str(0))
-
-    
-    def get_value(self, line_edit):
-        # Get the inputted text from the specified QLineEdit
-        input_text = line_edit.text()
-
-        # Convert the input to a float, if desired
-        try:
-            value = float(input_text)
-            # Save the input value to the dictionary using the line_edit as the key
-            self.offsetInputValues[line_edit.objectName()] = value
-            print(self.offsetInputValues)
-        except ValueError:
-            print("Invalid input")
 
 # Create the PyQt5 application
 app = QApplication([])
@@ -215,6 +149,7 @@ app = QApplication([])
 # Create the main window and show it
 main_window = MainWindow()
 main_window.show()
+main_window.update()
 
 # Start the PyQt5 event loop
 app.exec_()

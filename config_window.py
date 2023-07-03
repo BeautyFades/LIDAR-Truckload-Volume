@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from sensor_plots import SensorPlots
-
 
 class ConfigWindow(QWidget):
     def __init__(self):
@@ -19,13 +18,16 @@ class ConfigWindow(QWidget):
         
         sensor_sliders = Sliders()
         content_layout.addWidget(sensor_sliders.get_widget())
-        
+                
         content.setLayout(content_layout)
         
         main_layout = QHBoxLayout()
         main_layout.addWidget(sidebar)
         main_layout.addWidget(content)
+
+        sensor_sliders.slider1.valueChanged.connect(lambda value: sensor_plots.update_plot1(str(value)))
         self.setLayout(main_layout)
+
         
 class Sidebar(QWidget):
     def __init__(self):
@@ -36,9 +38,9 @@ class Sidebar(QWidget):
         sidebar_layout = QVBoxLayout()
         
         groups = [
-            ("Left Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (m)"]),
-            ("Top Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (m)"]),
-            ("Right Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (m)"]),
+            ("Left Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (mm)"]),
+            ("Top Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (mm)"]),
+            ("Right Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (mm)"]),
         ]
         
         for group_label, inputs in groups:
@@ -55,7 +57,8 @@ class Sidebar(QWidget):
                     input_box = QSpinBox()
                 else:
                     input_box = QDoubleSpinBox()
-                input_box.setRange(0, 1000)
+                    input_box.setSingleStep(0.1)  # Set the step to 5
+                input_box.setRange(-1000, 1000)
                 group_layout.addRow(label, input_box)
                 
                 # Dynamically store variables for each input on self
@@ -77,11 +80,14 @@ class Sliders(QWidget):
         # Add sliders below each polar plot
         self.slider1 = QSlider()
         self.slider1.setOrientation(Qt.Horizontal)
+        self.slider1.setMaximum(500)
         label1 = QLabel("Left Sensor")
         self.spin_box1 = QSpinBox()
-        self.spin_box1.setRange(0, 100)
+        self.spin_box1.setRange(0, 500)
         self.spin_box1.valueChanged.connect(lambda value: self.slider1.setValue(value))
         self.slider1.valueChanged.connect(lambda value: self.spin_box1.setValue(value))
+
+        #self.slider1.valueChanged.connect(lambda value: ConfigWindow.sensor_plots.update_plot1('0'))
 
         self.slider2 = QSlider()
         self.slider2.setOrientation(Qt.Horizontal)
@@ -97,7 +103,7 @@ class Sliders(QWidget):
         self.spin_box3 = QSpinBox()
         self.spin_box3.setRange(0, 100)
         self.spin_box3.valueChanged.connect(lambda value: self.slider3.setValue(value))
-        self.slider3.valueChanged.connect(lambda value: self.spin_box3.setValue(value))
+        self.slider3.valueChanged.connect(lambda value: self.spin_box3.setValue(value))        
 
         sliders_layout = QHBoxLayout()
         sliders_layout.addWidget(label1)
