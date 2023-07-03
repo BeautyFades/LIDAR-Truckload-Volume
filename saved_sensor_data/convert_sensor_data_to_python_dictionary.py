@@ -2,6 +2,12 @@ import struct
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+from math import radians
+
+POLAR_ANGLES = [radians(a / 10) for a in range(0, 3600, 2)]
+def polar2cart(r, theta):
+    return r * np.exp(1j * theta)
+
 
 def parse_binary_file(file_path):
     packets = {}
@@ -33,43 +39,51 @@ def parse_binary_file(file_path):
             
             # Unpack the bytes to integers in Little-Endian byte order
             packet_int = struct.unpack(f'<{num_elements}I', packet_data[:buffer_size])
+            packet_int = list(packet_int)
+            final_packet_int = []
+            for elem in packet_int:
+                if elem > 3000 or elem < -3000:
+                    elem = 0
+                final_packet_int.append(elem)
             
             # Append the integers to the temporary group
-            temp_group.extend(list(packet_int))
+            temp_group.extend(final_packet_int)
             
             # Check if we have formed a group of 6 packets
             if len(temp_group) == 1800:
-                packets[i] = (temp_group)
+                temp_group2 = []
+                for index, elem in enumerate(temp_group):
+                    complex_num = polar2cart(elem, POLAR_ANGLES[index])
+                    cart_tuple = (complex_num.real, complex_num.imag)
+                    temp_group2.append(cart_tuple)
+
+
+                packets[i] = temp_group2
                 temp_group = []
                 i = i + 1
             
             # Move the start_index to the next valid position
             start_index = end_index + len(magic_byte)
 
-            
-    
     return packets
 
+DICT = parse_binary_file('saved_sensor_data/left_sensor.bin')
 
-def save_dict_to_file(dictionary, file_path):
-    with open(file_path, 'w') as file:
-        json.dump(dictionary, file)
-save_dict_to_file(parse_binary_file('saved_sensor_data/top_sensor.bin'), 'top_sensor_dict.py')
+# def save_dict_to_file(dictionary, file_path):
+#     with open(file_path, 'w') as file:
+#         json.dump(dictionary, file)
+# save_dict_to_file(parse_binary_file('saved_sensor_data/top_sensor.bin'), 'sensor_data_dict_format/top_sensor_dict.py')
+# save_dict_to_file(parse_binary_file('saved_sensor_data/left_sensor.bin'), 'sensor_data_dict_format/left_sensor_dict.py')
+# save_dict_to_file(parse_binary_file('saved_sensor_data/right_sensor.bin'), 'sensor_data_dict_format/right_sensor_dict.py')
 
 
-def plot_first_packet(packets):
-    packet = packets[0]
-    num_elements = len(packet)
-    
-    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-    ax.set_rlim(0, 4000)  # Set the radial axis limit
-    
-    theta = np.linspace(0, 2*np.pi, num_elements, endpoint=False)
-    r = packet
-    
-    ax.plot(theta, r)
-    ax.set_rticks([])  # Remove radial tick labels if not needed
-    
-    plt.title('Packet Values (First 1800 Elements)')
+def plot_key(dictionary, key):
+    x_coords, y_coords = zip(*dictionary[key])
+    plt.plot(x_coords, y_coords)
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title(f'Plot of Key: {key}')
     plt.show()
-#plot_first_packet(parse_binary_file('saved_sensor_data/left_sensor.bin'))
+
+plot_key(DICT, 480)
+
