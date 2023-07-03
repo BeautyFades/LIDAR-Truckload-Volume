@@ -8,6 +8,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
 from udp_server_thread import UDPServerThread
 from math import radians
+from time import sleep
 
 from config_window import ConfigWindow
 from sensor_plots import SensorPlots
@@ -106,7 +107,7 @@ class MainWindow(QMainWindow):
         sensor_plots = SensorPlots()
 
         self.layout.addWidget(self.headerLabel)
-        self.layout.addWidget(sensor_plots.get_widget())
+        self.layout.addWidget(sensor_plots.get_widget(), stretch=9)
         self.layout.addLayout(start_stop_layout) 
         self.layout.addWidget(self.processButton)
         self.layout.addWidget(self.plotLabel)
@@ -128,14 +129,24 @@ class MainWindow(QMainWindow):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.startButton.setText('Scanning...')
-        self.udp_thread1.start()
-        self.udp_thread1.packet_received.connect(self.update_plot1)
 
-        self.udp_thread2.start()
-        self.udp_thread2.packet_received.connect(self.update_plot2)
+        QApplication.processEvents()
 
-        self.udp_thread3.start()
-        self.udp_thread3.packet_received.connect(self.update_plot3)
+        sleep(2)
+        QMessageBox.critical(None, "Erro", "Nenhum sensor com IP conhecido foi detectado!")
+
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.startButton.setText('Start Scanning')
+
+        # self.udp_thread1.start()
+        # self.udp_thread1.packet_received.connect(self.update_plot1)
+
+        # self.udp_thread2.start()
+        # self.udp_thread2.packet_received.connect(self.update_plot2)
+
+        # self.udp_thread3.start()
+        # self.udp_thread3.packet_received.connect(self.update_plot3)
 
     def stop_button_task(self):
         self.startButton.setEnabled(True)
