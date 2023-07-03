@@ -24,9 +24,28 @@ class ConfigWindow(QWidget):
         main_layout.addWidget(sidebar)
         main_layout.addWidget(content)
 
-        sensor_sliders.slider1.valueChanged.connect(lambda value: sensor_plots.update_plot_top(str(value),   sidebar.top_x_offset_mm.value(),   sidebar.top_y_offset_mm.value()))
-        sensor_sliders.slider2.valueChanged.connect(lambda value: sensor_plots.update_plot_left(str(value),  sidebar.left_x_offset_mm.value(),  sidebar.left_y_offset_mm.value()))
-        sensor_sliders.slider3.valueChanged.connect(lambda value: sensor_plots.update_plot_right(str(value), sidebar.right_x_offset_mm.value(), sidebar.right_y_offset_mm.value()))
+        sensor_sliders.slider1.valueChanged.connect(lambda value: sensor_plots.update_plot_top(str(value),   sidebar.top_x_offset_mm,   sidebar.top_y_offset_mm, sidebar.top_angle_offset))
+        sensor_sliders.slider2.valueChanged.connect(lambda value: sensor_plots.update_plot_left(str(value),  sidebar.left_x_offset_mm,  sidebar.left_y_offset_mm, sidebar.left_angle_offset))
+        sensor_sliders.slider3.valueChanged.connect(lambda value: sensor_plots.update_plot_right(str(value), sidebar.right_x_offset_mm, sidebar.right_y_offset_mm, sidebar.right_angle_offset))
+
+
+
+        sidebar.top_x_offset_mm.valueChanged.connect(lambda value: sensor_plots.update_plot_top(str(sensor_sliders.slider1.value()), sidebar.top_x_offset_mm, sidebar.top_y_offset_mm, sidebar.top_angle_offset))
+        sidebar.top_y_offset_mm.valueChanged.connect(lambda value: sensor_plots.update_plot_top(str(sensor_sliders.slider1.value()), sidebar.top_x_offset_mm, sidebar.top_y_offset_mm, sidebar.top_angle_offset))
+        sidebar.top_angle_offset.valueChanged.connect(lambda value: sensor_plots.update_plot_top(str(sensor_sliders.slider1.value()), sidebar.top_x_offset_mm, sidebar.top_y_offset_mm, sidebar.top_angle_offset))
+
+
+
+        sidebar.left_x_offset_mm.valueChanged.connect(lambda value: sensor_plots.update_plot_left(str(sensor_sliders.slider2.value()), sidebar.left_x_offset_mm, sidebar.left_y_offset_mm, sidebar.left_angle_offset))
+        sidebar.left_y_offset_mm.valueChanged.connect(lambda value: sensor_plots.update_plot_left(str(sensor_sliders.slider2.value()), sidebar.left_x_offset_mm, sidebar.left_y_offset_mm, sidebar.left_angle_offset))
+        sidebar.left_angle_offset.valueChanged.connect(lambda value: sensor_plots.update_plot_left(str(sensor_sliders.slider2.value()), sidebar.left_x_offset_mm, sidebar.left_y_offset_mm, sidebar.left_angle_offset))
+
+
+
+
+        sidebar.right_x_offset_mm.valueChanged.connect(lambda value: sensor_plots.update_plot_right(str(sensor_sliders.slider3.value()), sidebar.right_x_offset_mm, sidebar.right_y_offset_mm, sidebar.right_angle_offset))
+        sidebar.right_y_offset_mm.valueChanged.connect(lambda value: sensor_plots.update_plot_right(str(sensor_sliders.slider3.value()), sidebar.right_x_offset_mm, sidebar.right_y_offset_mm, sidebar.right_angle_offset))
+        sidebar.right_angle_offset.valueChanged.connect(lambda value: sensor_plots.update_plot_right(str(sensor_sliders.slider3.value()), sidebar.right_x_offset_mm, sidebar.right_y_offset_mm, sidebar.right_angle_offset))
         self.setLayout(main_layout)
 
         
@@ -58,7 +77,7 @@ class Sidebar(QWidget):
                 else:
                     input_box = QDoubleSpinBox()
                     input_box.setSingleStep(0.1)  # Set the step to 5
-                input_box.setRange(-1000, 1000)
+                input_box.setRange(-2000, 2000)
                 group_layout.addRow(label, input_box)
                 
                 # Dynamically store variables for each input on self
@@ -67,9 +86,7 @@ class Sidebar(QWidget):
                 
                 input_box.valueChanged.connect(lambda value, var=var_name: setattr(self, var, value))
                 input_box.valueChanged.connect(lambda value, var=var_name: print(f"{var} = {value}"))
-                
-                
-            
+                            
             sidebar_layout.addWidget(group_widget)
         
         self.setLayout(sidebar_layout)        
@@ -80,19 +97,19 @@ class Sliders(QWidget):
         # Add sliders below each polar plot
         self.slider1 = QSlider()
         self.slider1.setOrientation(Qt.Horizontal)
-        self.slider1.setMaximum(705)
+        self.slider1.setMaximum(548)
         label1 = QLabel("Top Sensor")
         self.spin_box1 = QSpinBox()
-        self.spin_box1.setRange(0, 705)
+        self.spin_box1.setRange(0, 548)
         self.spin_box1.valueChanged.connect(lambda value: self.slider1.setValue(value))
         self.slider1.valueChanged.connect(lambda value: self.spin_box1.setValue(value))
 
         self.slider2 = QSlider()
         self.slider2.setOrientation(Qt.Horizontal)
-        self.slider2.setMaximum(548)
+        self.slider2.setMaximum(705)
         label2 = QLabel("Left Sensor")
         self.spin_box2 = QSpinBox()
-        self.spin_box2.setRange(0, 548)
+        self.spin_box2.setRange(0, 705)
         self.spin_box2.valueChanged.connect(lambda value: self.slider2.setValue(value))
         self.slider2.valueChanged.connect(lambda value: self.spin_box2.setValue(value))
 
