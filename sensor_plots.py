@@ -8,50 +8,55 @@ from math import radians
 from matplotlib.figure import Figure
 
 from sensor_data_dict_format import top_sensor_dict
+from sensor_data_dict_format import left_sensor_dict
+from sensor_data_dict_format import right_sensor_dict
 
 # Create a polar plot
-class SensorPlots(QWidget):
+class SensorPlots():
     def __init__(self):
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
         
-        
-        self.plt1 = self.figure.add_subplot(1, 3, 1)
-        self.plt1.set_ylim(-3000, 3000)
-        self.plt1.set_xlim(-2500, 500)
+        self.plt1 = self.figure.add_subplot(111)
+        self.plt1.set_ylim(-2500, 500)
+        self.plt1.set_xlim(-1500, 1500)
 
-        # self.ax2 = self.figure.add_subplot(1, 3, 2, projection='polar')
-        # self.ax2.set_theta_zero_location('N')
-        # self.ax2.set_theta_direction(-1)
-        # self.ax2.set_rlim(0, 3000)
-        # self.ax2.set_rmax(3000)
-        # self.line2, = self.ax2.plot([], [], 'b')
-
-        # self.ax3 = self.figure.add_subplot(1, 3, 3, projection='polar')
-        # self.ax3.set_theta_zero_location('N')
-        # self.ax3.set_theta_direction(-1)
-        # self.ax3.set_rlim(0, 3000)
-        # self.ax3.set_rmax(3000)
-        # self.line3, = self.ax3.plot([], [], 'b')
-        
-        self.figure.subplots_adjust(wspace=0.5)  # Increase the value to increase the spacing
+        self.line1, = self.plt1.plot(0, 0, label='Top', color='black')
+        self.line2, = self.plt1.plot(0, 0, label='Left', color='blue')
+        self.line3, = self.plt1.plot(0, 0, label='Right', color='red')
         
     def get_widget(self):
-        canvas = FigureCanvas(self.figure)
-
         widget = QWidget()
         layout = QVBoxLayout()
-        layout.addWidget(canvas)
+        layout.addWidget(self.canvas)
         widget.setLayout(layout)
 
         return widget
     
-    def update_plot1(self, dict_index):
-        dict_values = top_sensor_dict.TOP[str(dict_index)]
-        x_values_t = [t[1]           for t in dict_values]
-        y_values_t = [t[0]           for t in dict_values]
+    def update_plot_top(self, dict_index, x_offset, y_offset):
+        dict_values_top = top_sensor_dict.TOP[str(dict_index)]
 
-        self.plt1.cla()
-        self.plt1.plot(x_values_t, y_values_t, marker=None, color='black')
+        x_values_t = [t[1] + x_offset          for t in dict_values_top]
+        y_values_t = [t[0] + y_offset          for t in dict_values_top]
+        print(x_values_t)
+
+        self.line1.set_data(x_values_t, y_values_t)
         self.canvas.draw_idle()
-        
+
+    def update_plot_left(self, dict_index):
+        update_plot_left = left_sensor_dict.LEFT[str(dict_index)]
+
+        x_values_l = [t[1]*-1 - 1226 for t in update_plot_left]
+        y_values_l = [t[0]    - 1020 for t in update_plot_left]
+
+        self.line2.set_data(x_values_l, y_values_l)
+        self.canvas.draw_idle()
+
+    def update_plot_right(self, dict_index):
+        dict_values_right = right_sensor_dict.RIGHT[str(dict_index)]
+
+        x_values_r = [t[1]    + 1180 for t in dict_values_right]
+        y_values_r = [t[0]    - 1070 for t in dict_values_right]
+
+        self.line3.set_data(x_values_r, y_values_r)
+        self.canvas.draw_idle()

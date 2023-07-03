@@ -150,6 +150,7 @@ app = QApplication([])
 main_window = MainWindow()
 main_window.show()
 main_window.update()
+app.processEvents()
 
 # Start the PyQt5 event loop
 app.exec_()

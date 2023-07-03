@@ -11,13 +11,12 @@ class ConfigWindow(QWidget):
         
         content = QWidget()
         content_layout = QVBoxLayout()
-        content_layout.addStretch(1)
 
         sensor_plots = SensorPlots()
-        content_layout.addWidget(sensor_plots.get_widget())
+        content_layout.addWidget(sensor_plots.get_widget(), stretch=9)
         
         sensor_sliders = Sliders()
-        content_layout.addWidget(sensor_sliders.get_widget())
+        content_layout.addWidget(sensor_sliders.get_widget(), stretch=1)
                 
         content.setLayout(content_layout)
         
@@ -25,7 +24,9 @@ class ConfigWindow(QWidget):
         main_layout.addWidget(sidebar)
         main_layout.addWidget(content)
 
-        sensor_sliders.slider1.valueChanged.connect(lambda value: sensor_plots.update_plot1(str(value)))
+        sensor_sliders.slider1.valueChanged.connect(lambda value: sensor_plots.update_plot_top(str(value),   sidebar.top_x_offset_mm.value(),   sidebar.top_y_offset_mm.value()))
+        sensor_sliders.slider2.valueChanged.connect(lambda value: sensor_plots.update_plot_left(str(value),  sidebar.left_x_offset_mm.value(),  sidebar.left_y_offset_mm.value()))
+        sensor_sliders.slider3.valueChanged.connect(lambda value: sensor_plots.update_plot_right(str(value), sidebar.right_x_offset_mm.value(), sidebar.right_y_offset_mm.value()))
         self.setLayout(main_layout)
 
         
@@ -33,14 +34,13 @@ class Sidebar(QWidget):
     def __init__(self):
         super().__init__()
         self.setStyleSheet("background-color: lightgray;")
-        # self.setMaximumWidth(220)
         
         sidebar_layout = QVBoxLayout()
         
         groups = [
-            ("Left Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (mm)"]),
-            ("Top Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (mm)"]),
-            ("Right Sensor", ["Measure Offset", "Angle Offset (º)", "Sensor Height (mm)"]),
+            ("Top Sensor", [  "Angle Offset", "X Offset mm", "Y Offset mm"]),
+            ("Left Sensor", [ "Angle Offset", "X Offset mm", "Y Offset mm"]),
+            ("Right Sensor", ["Angle Offset", "X Offset mm", "Y Offset mm"]),
         ]
         
         for group_label, inputs in groups:
@@ -80,28 +80,28 @@ class Sliders(QWidget):
         # Add sliders below each polar plot
         self.slider1 = QSlider()
         self.slider1.setOrientation(Qt.Horizontal)
-        self.slider1.setMaximum(500)
-        label1 = QLabel("Left Sensor")
+        self.slider1.setMaximum(705)
+        label1 = QLabel("Top Sensor")
         self.spin_box1 = QSpinBox()
-        self.spin_box1.setRange(0, 500)
+        self.spin_box1.setRange(0, 705)
         self.spin_box1.valueChanged.connect(lambda value: self.slider1.setValue(value))
         self.slider1.valueChanged.connect(lambda value: self.spin_box1.setValue(value))
 
-        #self.slider1.valueChanged.connect(lambda value: ConfigWindow.sensor_plots.update_plot1('0'))
-
         self.slider2 = QSlider()
         self.slider2.setOrientation(Qt.Horizontal)
-        label2 = QLabel("Top Sensor")
+        self.slider2.setMaximum(548)
+        label2 = QLabel("Left Sensor")
         self.spin_box2 = QSpinBox()
-        self.spin_box2.setRange(0, 100)
+        self.spin_box2.setRange(0, 548)
         self.spin_box2.valueChanged.connect(lambda value: self.slider2.setValue(value))
         self.slider2.valueChanged.connect(lambda value: self.spin_box2.setValue(value))
 
         self.slider3 = QSlider()
         self.slider3.setOrientation(Qt.Horizontal)
+        self.slider3.setMaximum(802)
         label3 = QLabel("Right Sensor") 
         self.spin_box3 = QSpinBox()
-        self.spin_box3.setRange(0, 100)
+        self.spin_box3.setRange(0, 802)
         self.spin_box3.valueChanged.connect(lambda value: self.slider3.setValue(value))
         self.slider3.valueChanged.connect(lambda value: self.spin_box3.setValue(value))        
 
