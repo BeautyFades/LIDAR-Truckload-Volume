@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import *
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 from PyQt5.QtCore import Qt, QTimer
 from math import radians
 from matplotlib.figure import Figure
@@ -29,6 +30,8 @@ class SensorPlots():
     def get_widget(self):
         widget = QWidget()
         layout = QVBoxLayout()
+        toolbar = NavigationToolbar2QT(self.canvas, widget)
+        layout.addWidget(toolbar)
         layout.addWidget(self.canvas)
         widget.setLayout(layout)
 
@@ -56,7 +59,6 @@ class SensorPlots():
 
         x_values_t = [t[1] + float(x_offset)          for t in dict_values_top]
         y_values_t = [t[0] + float(y_offset)          for t in dict_values_top]
-        print(x_values_t)
 
         self.line1.set_data(x_values_t, y_values_t)
         self.canvas.draw_idle()

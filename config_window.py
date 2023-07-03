@@ -76,7 +76,7 @@ class Sidebar(QWidget):
                     input_box = QSpinBox()
                 else:
                     input_box = QDoubleSpinBox()
-                    input_box.setSingleStep(0.1)  # Set the step to 5
+                    input_box.setSingleStep(1)  # Set the step to 1
                 input_box.setRange(-2000, 2000)
                 group_layout.addRow(label, input_box)
                 
