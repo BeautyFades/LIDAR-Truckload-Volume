@@ -54,7 +54,7 @@ def parse_binary_file(file_path):
                 temp_group2 = []
                 for index, elem in enumerate(temp_group):
                     complex_num = polar2cart(elem, POLAR_ANGLES[index])
-                    cart_tuple = (complex_num.real, complex_num.imag)
+                    cart_tuple = (round(complex_num.real, 3), round(complex_num.imag, 3))
                     temp_group2.append(cart_tuple)
 
 
@@ -77,13 +77,13 @@ DICT = parse_binary_file('saved_sensor_data/left_sensor.bin')
 # save_dict_to_file(parse_binary_file('saved_sensor_data/right_sensor.bin'), 'sensor_data_dict_format/right_sensor_dict.py')
 
 
-def plot_key(dictionary, key):
-    x_coords, y_coords = zip(*dictionary[key])
-    plt.plot(x_coords, y_coords)
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title(f'Plot of Key: {key}')
-    plt.show()
+# def plot_key(dictionary, key):
+#     x_coords, y_coords = zip(*dictionary[key])
+#     plt.plot(x_coords, y_coords)
+#     plt.xlabel('X')
+#     plt.ylabel('Y')
+#     plt.title(f'Plot of Key: {key}')
+#     plt.show()
 
-plot_key(DICT, 480)
+# plot_key(DICT, 0)
 

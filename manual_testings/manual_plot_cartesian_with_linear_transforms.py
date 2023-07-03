@@ -5487,7 +5487,7 @@ y_values_r = [t[0]    - 1070 for t in RIGHT_DATA_CARTESIAN]
 # Create a plot
 plt.plot(x_values_t, y_values_t, marker=None, color='black')
 plt.plot(x_values_l, y_values_l, marker=None, color='blue')
-#plt.plot(x_values_r, y_values_r, marker=None, color='red')
+plt.plot(x_values_r, y_values_r, marker=None, color='red')
 
 # Add labels and title
 plt.xlabel('X')
