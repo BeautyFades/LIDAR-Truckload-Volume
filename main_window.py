@@ -9,6 +9,9 @@ from PyQt5.QtWidgets import *
 from udp_server_thread import UDPServerThread
 from math import radians
 
+from config_window import ConfigWindow
+from sensor_plots import SensorPlots
+
 # Create a PyQt5 main window
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -24,53 +27,15 @@ class MainWindow(QMainWindow):
         self.udp_thread2 = UDPServerThread(ip_address='127.0.0.1', udp_port=54322, verbose=False)
         self.udp_thread3 = UDPServerThread(ip_address='127.0.0.1', udp_port=54323, verbose=False)
 
-        # Create a polar plot
-        self.angle = [radians(a / 10) for a in range(0, 3600, 2)]
-        
-        self.ax1 = self.figure.add_subplot(1, 3, 1, projection='polar')
-        self.ax1.set_theta_zero_location('N')
-        self.ax1.set_theta_direction(-1)
-        self.ax1.set_rlim(0, 3000)
-        self.ax1.set_rmax(3000)
-        self.line1, = self.ax1.plot([], [], 'b')
-
-        self.ax2 = self.figure.add_subplot(1, 3, 2, projection='polar')
-        self.ax2.set_theta_zero_location('N')
-        self.ax2.set_theta_direction(-1)
-        self.ax2.set_rlim(0, 3000)
-        self.ax2.set_rmax(3000)
-        self.line2, = self.ax2.plot([], [], 'b')
-
-        self.ax3 = self.figure.add_subplot(1, 3, 3, projection='polar')
-        self.ax3.set_theta_zero_location('N')
-        self.ax3.set_theta_direction(-1)
-        self.ax3.set_rlim(0, 3000)
-        self.ax3.set_rmax(3000)
-        self.line3, = self.ax3.plot([], [], 'b')
-        
-        self.figure.subplots_adjust(wspace=0.5)  # Increase the value to increase the spacing
-
     def initUI(self):
-        self.setWindowTitle("UFSC - Coontrol - LiDAR Volume Measurement")
+        self.setWindowTitle("Truckload Volume Calculator")
         self.setWindowIcon(QIcon("interface/coontrol-icon.png"))
 
         self.central_widget = QWidget(self)
         self.central_widget.setObjectName('centralWidget')
         self.layout = QVBoxLayout(self.central_widget)
 
-        self.topSensorLabel = QLabel('Top Sensor Offset:', self.central_widget)
-        self.topSensorLabel.setObjectName('topSensorLabel')
-
-        self.topSensorAngleValidator = QDoubleValidator()
-        self.topSensorAngleValidator.setDecimals(4)
-        self.topSensorAngleValidator.setRange(-90, 90)
-        self.topSensorAngleBox = QLineEdit(self.central_widget)
-        self.topSensorAngleBox.setObjectName('topSensorAngleBox')
-        self.topSensorAngleBox.setValidator(self.topSensorAngleValidator)
-        self.topSensorAngleBox.textChanged.connect(self.update_formatting)
-        self.topSensorAngleBox.textChanged.connect(lambda: self.get_value(self.topSensorAngleBox))
-
-        button_layout = QHBoxLayout()  # Horizontal layout for buttons
+        start_stop_layout = QHBoxLayout()  # Horizontal layout for buttons
 
         self.stopButton = QPushButton(self.central_widget)
         self.stopButton.setObjectName('stopButton')
@@ -108,8 +73,8 @@ class MainWindow(QMainWindow):
                                     "font-weight: 700;"
                                     )
         
-        button_layout.addWidget(self.startButton)  # Add startButton to the horizontal layout
-        button_layout.addWidget(self.stopButton)  # Add stopButton to the horizontal layout
+        start_stop_layout.addWidget(self.startButton)  # Add startButton to the horizontal layout
+        start_stop_layout.addWidget(self.stopButton)  # Add stopButton to the horizontal layout
 
         self.processButton = QPushButton(self.central_widget)
         self.processButton.setObjectName('processButton')
@@ -117,6 +82,7 @@ class MainWindow(QMainWindow):
         self.processButton.setEnabled(True)
         self.processButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.processButton.clicked.connect(self.stop_button_task)
+        self.processButton.clicked.connect(self.open_config_window)
         self.processButton.setStyleSheet("border: none;\n"
                                         "font-family: 'Lato';\n"
                                         "background-color: #FF8C00;\n"
@@ -137,21 +103,20 @@ class MainWindow(QMainWindow):
         self.plotLabel = QLabel(self.central_widget)
         self.plotLabel.setObjectName(u"plotLabel")
         
-        # Create a FigureCanvas to display the polar plot
-        self.figure = plt.figure()
-        self.canvas = FigureCanvas(self.figure)
+        sensor_plots = SensorPlots()
 
         self.layout.addWidget(self.headerLabel)
-        # self.layout.addWidget(self.startButton)
-        # self.layout.addWidget(self.stopButton)
-        self.layout.addWidget(self.topSensorLabel)
-        self.layout.addWidget(self.topSensorAngleBox)
-        self.layout.addWidget(self.canvas)
-        self.layout.addLayout(button_layout) 
+        self.layout.addWidget(sensor_plots.get_widget())
+        self.layout.addLayout(start_stop_layout) 
         self.layout.addWidget(self.processButton)
         self.layout.addWidget(self.plotLabel)
 
         self.setCentralWidget(self.central_widget)
+        
+    def open_config_window(self):
+        print("Opening Config Window")
+        self.config_window = ConfigWindow()
+        self.config_window.show()
 
     def checkboxStateChanged(self, state):
         if state == 0:
@@ -177,12 +142,12 @@ class MainWindow(QMainWindow):
         self.stopButton.setEnabled(False)
         self.startButton.setText('Start Scanning')
 
-        if self.udp_thread1.isRunning():
-            self.udp_thread1.packet_received.disconnect(self.update_plot)
-            self.udp_thread1.stop()
-            self.udp_thread1.wait()
-            self.line.set_data([0], [0])
-            self.canvas.draw()
+        # if self.udp_thread1.isRunning():
+        #     self.udp_thread1.packet_received.disconnect(self.update_plot1)
+        #     self.udp_thread1.stop()
+        #     self.udp_thread1.wait()
+        #     self.line.set_data([0], [0])
+        #     self.canvas.draw()
 
 
     def update_plot1(self, distances):
@@ -244,11 +209,8 @@ class MainWindow(QMainWindow):
         except ValueError:
             print("Invalid input")
 
-
-
 # Create the PyQt5 application
 app = QApplication([])
-
 
 # Create the main window and show it
 main_window = MainWindow()

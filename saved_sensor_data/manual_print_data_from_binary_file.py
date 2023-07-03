@@ -1,8 +1,6 @@
 import struct
 import time
 
-CLIENT_UDP_IP = "127.0.0.1" # IP address of the Receiver UDP server
-CLIENT_UDP_PORT = 54321 # Port number of the Receiver UDP server
 INTERVAL = 0.1 # Time interval between each packet (in seconds)
 
 print('Sensor starting...')
@@ -73,4 +71,4 @@ with open('saved_sensor_data/left_sensor.bin', 'rb') as f:
             remaining += chunk
             # Read the next chunk of chunk from the file
             chunk = f.read(2048)
-            time.sleep(INTERVAL) # Wait for the specified interval
+            #time.sleep(INTERVAL) # Wait for the specified interval

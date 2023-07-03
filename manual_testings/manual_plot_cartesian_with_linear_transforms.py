@@ -5464,7 +5464,7 @@ right_sensor_rot_angle = -1.3  # Rotation angle in degrees
 RIGHT_DATA_CARTESIAN = rotate_points(RIGHT_DATA_CARTESIAN, right_sensor_pivot, right_sensor_rot_angle)
 
 left_sensor_pivot = (0, 0)  # Pivot point
-left_sensor_rot_angle = 2  # Rotation angle in degrees
+left_sensor_rot_angle = 2.2  # Rotation angle in degrees
 LEFT_DATA_CARTESIAN = rotate_points(LEFT_DATA_CARTESIAN, left_sensor_pivot, left_sensor_rot_angle)
 
 top_sensor_pivot = (0, 0)  # Pivot point
@@ -5477,7 +5477,7 @@ TOP_DATA_CARTESIAN = rotate_points(TOP_DATA_CARTESIAN, top_sensor_pivot, top_sen
 x_values_t = [t[1]           for t in TOP_DATA_CARTESIAN]
 y_values_t = [t[0]           for t in TOP_DATA_CARTESIAN]
 x_values_l = [t[1]*-1 - 1226 for t in LEFT_DATA_CARTESIAN]
-y_values_l = [t[0]    - 1070 for t in LEFT_DATA_CARTESIAN]
+y_values_l = [t[0]    - 1020 for t in LEFT_DATA_CARTESIAN]
 x_values_r = [t[1]    + 1180 for t in RIGHT_DATA_CARTESIAN]
 y_values_r = [t[0]    - 1070 for t in RIGHT_DATA_CARTESIAN]
 
@@ -5487,7 +5487,7 @@ y_values_r = [t[0]    - 1070 for t in RIGHT_DATA_CARTESIAN]
 # Create a plot
 plt.plot(x_values_t, y_values_t, marker=None, color='black')
 plt.plot(x_values_l, y_values_l, marker=None, color='blue')
-plt.plot(x_values_r, y_values_r, marker=None, color='red')
+#plt.plot(x_values_r, y_values_r, marker=None, color='red')
 
 # Add labels and title
 plt.xlabel('X')
